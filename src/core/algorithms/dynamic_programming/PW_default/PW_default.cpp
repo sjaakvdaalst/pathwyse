@@ -279,9 +279,16 @@ void PWDefault::extend(LabelAdv* candidate) {
         if(problem->hasPairs() and not label_manager->isPairingFeasible(candidate, neigh))
             continue;
 
+        //Unreachable bits cover monotone resources only; the others are checked directly. [dev-sjaak]
+        //The start label has no bits yet, so its extensions are checked in full.
         active = not unreachable_active.empty() and unreachable_active[node].get(neigh);
-        if((active and label_manager->isNodeReachable(candidate, neigh)) or
-           (not active and label_manager->isExtensionFeasible(candidate, neigh))){
+        bool is_start = candidate->getPredecessorNode() < 0;
+        bool feasible = (active and not is_start)
+            ? label_manager->isNodeReachable(candidate, neigh) and
+              label_manager->isExtensionFeasible(candidate, neigh, SCOPE_NONMONOTONE)
+            : label_manager->isExtensionFeasible(candidate, neigh);
+
+        if(feasible){
 
             //critical res extension check
             if(bidirectional and not label_manager->isCriticalExtensionFeasible(candidate, neigh))

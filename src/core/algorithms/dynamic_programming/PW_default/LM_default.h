@@ -8,6 +8,10 @@
 //Queue based Label Manager for PW_default.
 //Handles data structures and returns candidates for the extension and join steps
 
+//Resource scope of a feasibility check [dev-sjaak]
+//Monotone resources never become feasible again along a route. Load with deliveries is not monotone.
+enum {SCOPE_ALL = 0, SCOPE_MONOTONE = 1, SCOPE_NONMONOTONE = 2};
+
 class LMDefault{
 
 public:
@@ -57,7 +61,7 @@ public:
     /** Label management**/
     //Label extension
     bool isNodeReachable(LabelAdv *label, int next_node);
-    bool isExtensionFeasible(LabelAdv *label, int next_node);
+    bool isExtensionFeasible(LabelAdv *label, int next_node, int scope = SCOPE_ALL);   //[dev-sjaak]
     bool isPairingFeasible(LabelAdv *label, int next_node);   //[dev-sjaak]
     bool isCriticalExtensionFeasible(LabelAdv *label, int next_node);
     void extendLabel(LabelAdv *current_label, LabelAdv *new_label, int next_node);
@@ -147,6 +151,8 @@ protected:
     int incumbent;
     bool use_visited, compare_unreachables;
     bool two_cycle_elimination;
+    std::vector<char> res_monotone;        //res_monotone[id] = 1 if resource id has no negative node consumption [dev-sjaak]
+    void computeMonotoneResources();
 
     int ndominated_fw, ndominated_bw;
     int nclosed_fw, nclosed_bw;

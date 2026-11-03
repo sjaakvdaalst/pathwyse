@@ -37,6 +37,8 @@ void LMDefault::initLM(){
     int n_nodes = problem->getNumNodes();
     int n_res = problem->getNumRes();
 
+    computeMonotoneResources();   //[dev-sjaak]
+
     //Reserve space for labels
     forward_labels.reserve(reserve_size);
     backward_labels.reserve(reserve_size);
@@ -342,17 +344,35 @@ bool LMDefault::isPairingFeasible(LabelAdv *label, int next_node) {
     return pickup < 0 or label->isOpen(pickup);         //delivery needs its pickup open
 }
 
-bool LMDefault::isExtensionFeasible(LabelAdv *label, int next_node) {
+//A resource is monotone if no node consumption is negative [dev-sjaak]
+void LMDefault::computeMonotoneResources() {
+    std::vector<Resource*>& resources = problem->getResources();
+    res_monotone.assign(resources.size(), 1);
+    for(int id = 0; id < resources.size(); id++)
+        for(int node = 0; node < problem->getNumNodes(); node++)
+            if(resources[id]->getNodeCost(node) < 0) {
+                res_monotone[id] = 0;
+                break;
+            }
+}
+
+bool LMDefault::isExtensionFeasible(LabelAdv *label, int next_node, int scope) {
     int current_value;
     bool direction = label->getDirection();
     double bounding = 1;
 
     std::vector<Resource*>& resources = problem->getResources();
 
+    if(scope != SCOPE_ALL and res_monotone.size() != resources.size())
+        computeMonotoneResources();
+
     int i = direction ? label->getNode() : next_node;
     int j = direction ? next_node : label->getNode();
 
     for(int id = 0; id < resources.size(); id++) {
+        //[dev-sjaak] skip resources outside the requested scope
+        if(scope != SCOPE_ALL and (scope == SCOPE_MONOTONE) != (bool)res_monotone[id])
+            continue;
         current_value = label->getSnapshot(id);
         current_value = resources[id]->extend(current_value, i, j, direction);
         if(!resources[id]->isFeasible(current_value, next_node, bounding, direction))
@@ -424,7 +444,7 @@ void LMDefault::updateUnreachables(LabelAdv *candidate) {
         bool direction = candidate->getDirection();
         std::vector<int> & neighbors = problem->getNeighbors(node, direction);
         for(auto & neigh: neighbors)
-            if(candidate->isReachable(neigh) and not isExtensionFeasible(candidate, neigh))
+            if(candidate->isReachable(neigh) and not isExtensionFeasible(candidate, neigh, SCOPE_MONOTONE))   //[dev-sjaak]
                 candidate->setUnreachable(neigh);
 
         if (not isExtensionFeasible(candidate, predecessor))
@@ -576,6 +596,10 @@ bool LMDefault::dominates(LabelAdv* l1, LabelAdv* l2)  {
     for(int id = 0; id < l1->getSnapshot().size(); id++)
         if(l1->getSnapshot(id) > l2->getSnapshot(id))
             return false;
+
+    // Open pickups: l1 must not carry more open requests than l2 [dev-sjaak]
+    if(problem->hasPairs() and not is_subset(l1->getOpen(), l2->getOpen()))
+        return false;
 
     if(not compare_unreachables)
         return true;
