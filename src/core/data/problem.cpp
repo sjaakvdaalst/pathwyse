@@ -6,12 +6,13 @@
 #include <utils/logger.h>
 
 /** Problem Management **/
-//Constructors and destructors
+//Constructors and destructors [dev-sjaak]
 Problem::Problem() {
     name = "undefined";
     n_nodes = 0;
     origin = 0;
     destination = 0;
+    n_pairs = 0;
     n_res = 0;
     n_arcs = 0;
     cost_scale_factor = 1.0;
@@ -393,6 +394,34 @@ int Problem::setNumNodes(int n) {
     Logger::debug("Set number of nodes: ", n);
     return RETURN_OK;
 }
+
+// setPair [dev-sjaak]
+int Problem::setPair(int pickup, int delivery) {
+    if (not nodeExists(pickup)) return RETURN_ERROR;
+    if (not nodeExists(delivery)) return RETURN_ERROR;
+    if(pickup == delivery) {
+        Logger::error("Pickup must be different from delivery");
+        return RETURN_ERROR;
+    }
+    if(pickup == origin or pickup == destination or delivery == origin or delivery == destination) {
+        Logger::error("Depot node cannot be a pickup or delivery event");
+        return RETURN_ERROR;
+    }
+    if((int)is_pickup.size() < n_nodes) {
+        is_pickup.resize(n_nodes, 0);     // flag: "not a pickup" yet
+        pickup_of.resize(n_nodes, -1);     // "no pickup assigned" yet
+    }
+
+    if(is_pickup[pickup] or pickup_of[pickup] >= 0 or is_pickup[delivery] or pickup_of[delivery] >= 0) {
+        Logger::error("A node can belong to one pair only");
+        return RETURN_ERROR;
+    }
+    is_pickup[pickup] = 1;
+    pickup_of[delivery] = pickup;
+    n_pairs += 1;
+    return RETURN_OK;
+   }
+
 
 int Problem::setOrigin(int origin) {
     if (not nodeExists(origin)) return RETURN_ERROR;

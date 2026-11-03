@@ -38,6 +38,9 @@ public:
     int getOrigin() {return origin;}
     int getDestination() {return destination;}
 
+    // Set pickup & delivery pairs [dev-sjaak]
+    int setPair(int pickup, int delivery);
+
     //Topology flags
     bool isDirected(){return directed;}
     bool isSymmetric(){return symmetric;}
@@ -167,6 +170,11 @@ protected:
     //Node information
     int n_nodes;
     int origin, destination;
+
+    // Pair data [dev-sjaak]
+    int n_pairs;
+    std::vector<char> is_pickup;
+    std::vector<int> pickup_of;
 
     //Arc information Data
     int n_arcs;

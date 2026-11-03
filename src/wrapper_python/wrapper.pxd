@@ -32,7 +32,7 @@ cdef extern from "solver.h":
         void initProblem()
         void buildProblem()
 
-        # Topology management
+        # Topology management [dev-sjaak]
         int setNumNodes(int n)
         int setOrigin(int origin)
         int setDestination(int destination)
@@ -40,6 +40,7 @@ cdef extern from "solver.h":
         int setCyclic(bool cyclic)
         int setSymmetric(bool symmetric)
         int addArc(int i, int j)
+        int setPair(int pickup, int delivery)
 
         # Objective
         int setInitCost(double value)
