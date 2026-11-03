@@ -38,11 +38,14 @@ public:
     int getOrigin() {return origin;}
     int getDestination() {return destination;}
 
+
+
     //Pickup-delivery pairs (precedence and pairing; supported by PWDefault with forward search only)
     int setPair(int pickup, int delivery);
     bool hasPairs() const {return n_pairs > 0;}
     bool isPickup(int node) const {return node >= 0 and node < (int)is_pickup.size() and is_pickup[node];}
     int getPickupOf(int node) const {return (node >= 0 and node < (int)pickup_of.size()) ? pickup_of[node] : -1;}
+
 
     //Topology flags
     bool isDirected(){return directed;}
