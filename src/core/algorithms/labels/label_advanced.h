@@ -31,6 +31,14 @@ public:
     void setUnreachable(int node){unreachable.set(node);}
     int getUnreachableCount(){return unreachable.count();}
 
+    // open requests [dev-sjaak]
+    void ensureOpen(int n_nodes) {if(open.empty()) open = Bitset(n_nodes);}
+    bool isOpen(int node) {return not open.empty() and open.get(node);}
+    bool hasOpen() const {return open.any();}
+    void setOpen(int node) {open.set(node);}
+    void clearOpen(int node) {if(not open.empty()) open.reset(node);}
+    Bitset & getOpen() {return open;}
+
     //Dominated and Elementary status management
     bool isDominated(){return label_type == DOMINATED;}
     void setDominated(){this->label_type = DOMINATED;}
@@ -55,6 +63,7 @@ protected:
     int extension_target = ALL;
     Bitset visited;
     Bitset unreachable;
+    Bitset open;
 };
 
 
