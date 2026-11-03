@@ -275,6 +275,10 @@ void PWDefault::extend(LabelAdv* candidate) {
         if(two_cycle_elimination and candidate->getPredecessorNode() == neigh)
             continue;
 
+        //Pickup-delivery pairs [dev-sjaak]
+        if(problem->hasPairs() and not label_manager->isPairingFeasible(candidate, neigh))
+            continue;
+
         active = not unreachable_active.empty() and unreachable_active[node].get(neigh);
         if((active and label_manager->isNodeReachable(candidate, neigh)) or
            (not active and label_manager->isExtensionFeasible(candidate, neigh))){

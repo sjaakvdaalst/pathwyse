@@ -63,6 +63,9 @@ void LMDefault::initLM(){
         forward_labels[0].initLabel(origin, predecessor, direction, n_res);
         if(use_visited)
             forward_labels[0].initVisited(origin, n_nodes);
+        //Open pickups of the start label [dev-sjaak]
+        if(problem->hasPairs())
+            forward_labels[0].ensureOpen(n_nodes);
         forward_labels[0].setObjective(objective->getInitValue() + objective->getNodeCost(origin));
         ++ins_attempts_fw;
 
@@ -329,6 +332,16 @@ bool LMDefault::isNodeReachable(LabelAdv *label, int next_node){
         return isExtensionFeasible(label, next_node);
 }
 
+//Pairing and precedence (forward search only) [dev-sjaak]
+bool LMDefault::isPairingFeasible(LabelAdv *label, int next_node) {
+    if(next_node == problem->getDestination())
+        return not label->hasOpen();                    //route ends with no open pickup
+    if(problem->isPickup(next_node))
+        return not label->isOpen(next_node);            //pickup cannot be opened twice
+    int pickup = problem->getPickupOf(next_node);
+    return pickup < 0 or label->isOpen(pickup);         //delivery needs its pickup open
+}
+
 bool LMDefault::isExtensionFeasible(LabelAdv *label, int next_node) {
     int current_value;
     bool direction = label->getDirection();
@@ -393,6 +406,14 @@ void LMDefault::extendLabel(LabelAdv *current_label, LabelAdv *new_label, int ne
         new_label->setSnapshot(id, new_value);
     }
 
+    //Update open pickups [dev-sjaak]
+    if(problem->hasPairs()) {
+        new_label->ensureOpen(problem->getNumNodes());
+        if(problem->isPickup(next_node))
+            new_label->setOpen(next_node);
+        else if(problem->getPickupOf(next_node) >= 0)
+            new_label->clearOpen(problem->getPickupOf(next_node));
+    }
 }
 
 void LMDefault::updateUnreachables(LabelAdv *candidate) {

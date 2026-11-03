@@ -58,6 +58,7 @@ public:
     //Label extension
     bool isNodeReachable(LabelAdv *label, int next_node);
     bool isExtensionFeasible(LabelAdv *label, int next_node);
+    bool isPairingFeasible(LabelAdv *label, int next_node);   //[dev-sjaak]
     bool isCriticalExtensionFeasible(LabelAdv *label, int next_node);
     void extendLabel(LabelAdv *current_label, LabelAdv *new_label, int next_node);
     void updateUnreachables(LabelAdv *label);
