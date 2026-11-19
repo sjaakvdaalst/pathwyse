@@ -7,6 +7,7 @@
 #include "resources/time.h"
 #include "resources/node_limit.h"
 #include "resources/time_windows.h"
+#include "resources/open_request.h"
 #include "resource_data.h"
 #include "utils/param.h"
 #include "utils/data_collector.h"

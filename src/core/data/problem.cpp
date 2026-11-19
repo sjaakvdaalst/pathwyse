@@ -121,6 +121,7 @@ int Problem::addResource(std::string type) {
     else if (type == "TIME")  res = new Time();
     else if (type == "TW") res = new TimeWindow();
     else if (type == "NODELIM") res = new NodeLim();
+    else if (type == "OPEN") res = new OpenRequest();
     else {
         Logger::warn("Resource " + type + "has no match and cannot be instantiated.");
         return -1;

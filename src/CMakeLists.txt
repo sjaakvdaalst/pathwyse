@@ -40,6 +40,8 @@ set(
         core/resources/time.cpp
         core/resources/time_windows.h
         core/resources/time_windows.cpp
+        core/resources/open_request.h
+        core/resources/open_request.cpp
 	
         core/algorithms/algorithm.h
         core/algorithms/algorithm.cpp
