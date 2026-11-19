@@ -9,6 +9,11 @@ OpenRequest::OpenRequest() {
 
 void OpenRequest::init(int origin, int destination) {
     this->destination = destination;
+
+    std::vector<int> consumption = data->getNodeCosts();
+    for(int node = 0; node < consumption.size(); node++)
+        if(consumption[node] == -1)
+            delivery_node = node;
 }
 
 int OpenRequest::extend(int current_value, int i, int j, bool direction) {

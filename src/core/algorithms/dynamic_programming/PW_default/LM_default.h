@@ -60,6 +60,7 @@ public:
     //Label extension
     bool isNodeReachable(LabelAdv *label, int next_node);
     bool isExtensionFeasible(LabelAdv *label, int next_node, bool monotone_only = false);
+    bool isOpenRequestReachable(LabelAdv *label);
     bool isCriticalExtensionFeasible(LabelAdv *label, int next_node);
     void extendLabel(LabelAdv *current_label, LabelAdv *new_label, int next_node);
     void updateUnreachables(LabelAdv *label);
@@ -154,6 +155,7 @@ protected:
     std::vector<Bitset>* unreachable_ng = nullptr;
     std::vector<std::vector<int>> masked_neighbors_fw, masked_neighbors_bw;
     bool two_cycle_elimination;
+    std::vector<std::pair<int, int>> open_requests;   //(resource id, delivery node) of every OpenRequest resource
 
     int ndominated_fw, ndominated_bw;
     int nclosed_fw, nclosed_bw;

@@ -292,6 +292,8 @@ void PWDefault::extend(LabelAdv* candidate) {
 
             //For each reachable node, extend label in that direction
             label_manager->extendLabel(candidate, &new_label, neigh);
+            if(not label_manager->isOpenRequestReachable(&new_label))
+                continue;
 
             //Update unreachables
             label_manager->updateUnreachables(&new_label);

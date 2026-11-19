@@ -102,6 +102,14 @@ void LMDefault::initLM(){
     turn_backward = destination;
     od_label.second = -1;
     joinComparisons = 0;
+
+    //Open request resources and their delivery nodes, for the dead-label test
+    open_requests.clear();
+    for(int id = 0; id < n_res; id++) {
+        OpenRequest* open_request = dynamic_cast<OpenRequest*>(resources[id]);
+        if(open_request != nullptr)
+            open_requests.push_back({id, open_request->getDeliveryNode()});
+    }
 }
 
 void LMDefault::readConfiguration() {
@@ -373,6 +381,15 @@ bool LMDefault::isCriticalExtensionFeasible(LabelAdv *label, int next_node) {
     if(not resources[RES_CRITICAL]->isFeasible(current_value, next_node, bounding, direction))
         return false;
 
+    return true;
+}
+
+
+//Dead label: the delivery of an open request can no longer be reached in time (forward search)
+bool LMDefault::isOpenRequestReachable(LabelAdv *label) {
+    for(auto & open_request: open_requests)
+        if(label->getSnapshot(open_request.first) == 1 and not isExtensionFeasible(label, open_request.second, true))
+            return false;
     return true;
 }
 
