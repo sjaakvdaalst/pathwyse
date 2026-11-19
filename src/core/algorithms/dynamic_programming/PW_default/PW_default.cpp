@@ -283,8 +283,8 @@ void PWDefault::extend(LabelAdv* candidate) {
             continue;
 
         active = not unreachable_active.empty() and unreachable_active[node].get(neigh);
-        if((active and label_manager->isNodeReachable(candidate, neigh)) or
-           (not active and label_manager->isExtensionFeasible(candidate, neigh))){
+        if(label_manager->isExtensionFeasible(candidate, neigh) and
+           (not active or label_manager->isNodeReachable(candidate, neigh))){
 
             //critical res extension check
             if(bidirectional and not label_manager->isCriticalExtensionFeasible(candidate, neigh))

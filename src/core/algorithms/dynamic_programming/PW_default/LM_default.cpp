@@ -331,7 +331,7 @@ bool LMDefault::isNodeReachable(LabelAdv *label, int next_node){
         return isExtensionFeasible(label, next_node);
 }
 
-bool LMDefault::isExtensionFeasible(LabelAdv *label, int next_node) {
+bool LMDefault::isExtensionFeasible(LabelAdv *label, int next_node, bool monotone_only) {
     int current_value;
     bool direction = label->getDirection();
     double bounding = 1;
@@ -342,6 +342,10 @@ bool LMDefault::isExtensionFeasible(LabelAdv *label, int next_node) {
     int j = direction ? next_node : label->getNode();
 
     for(int id = 0; id < resources.size(); id++) {
+        //Resources with negative consumption can become feasible again later, so they must not make a node unreachable for good
+        if(monotone_only and resources[id]->hasNegativeCost())
+            continue;
+
         current_value = label->getSnapshot(id);
         current_value = resources[id]->extend(current_value, i, j, direction);
         if(!resources[id]->isFeasible(current_value, next_node, bounding, direction))
@@ -406,7 +410,7 @@ void LMDefault::updateUnreachables(LabelAdv *candidate) {
         bool direction = candidate->getDirection();
         std::vector<int> & neighbors = direction ? masked_neighbors_fw[node] : masked_neighbors_bw[node];
         for(auto & neigh: neighbors)
-            if(candidate->isReachable(neigh) and not isExtensionFeasible(candidate, neigh))
+            if(candidate->isReachable(neigh) and not isExtensionFeasible(candidate, neigh, true))
                 candidate->setUnreachable(neigh);
 
         if (two_cycle_elimination and

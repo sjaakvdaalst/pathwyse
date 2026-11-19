@@ -59,7 +59,7 @@ public:
     /** Label management**/
     //Label extension
     bool isNodeReachable(LabelAdv *label, int next_node);
-    bool isExtensionFeasible(LabelAdv *label, int next_node);
+    bool isExtensionFeasible(LabelAdv *label, int next_node, bool monotone_only = false);
     bool isCriticalExtensionFeasible(LabelAdv *label, int next_node);
     void extendLabel(LabelAdv *current_label, LabelAdv *new_label, int next_node);
     void updateUnreachables(LabelAdv *label);
