@@ -1,5 +1,5 @@
 """
-Random PDPTW pricing instances: PathWyse (pairs, forward search) against brute force.
+Random PDPTW pricing instances: PathWyse (resources TW, CAP and one OPEN per request, forward search) against brute force.
 
 Run from any directory (pathwyse.set next to this file is copied to a temporary working directory):
     python test_random.py <instances> <capacity> <seed> [--algo exact|dom|queue] [--nsol K]
@@ -149,6 +149,12 @@ def build_solver(inst, algo, nsol):
     tw = pw.addResource("TW")      # resource 0 is the critical resource
     cap = pw.addResource("CAP")
     pw.setResBounds(cap, 0, inst["Q"])
+
+    for r in range(1, n + 1):
+        open_request = pw.addResource("OPEN")      # 1 while request r is picked up and not yet delivered
+        pw.setResNodeConsumption(open_request, r, 1)
+        pw.setResNodeConsumption(open_request, n + r, -1)
+    
     for i in range(N):
         pw.setResNodeBound(tw, i, inst["lb"][i], inst["ub"][i])
         pw.setResNodeConsumption(tw, i, inst["service"][i])
@@ -164,7 +170,6 @@ def build_solver(inst, algo, nsol):
             pw.setResArcConsumption(tw, i, j, inst["tt"][i][j])
     for i in range(1, n + 1):
         pw.setNodeCost(i, -inst["pi"][i])
-        assert pw.setPair(i, n + i) == 1
     pw.setInitCost(inst["init"])
     pw.buildProblem()
     pw.setupAlgorithms()
