@@ -82,6 +82,10 @@ public:
     //Solve Problem with selected Algorithms
     void solve();
 
+    //Time limit and status of one algorithm
+    void setAlgorithmTimelimit(int id, double seconds) {algorithms[id]->setTimelimit(seconds);}
+    int getAlgorithmStatus(int id) {return algorithms[id]->getStatus();}
+
     //Reset algorithms
     void resetAlgorithm(int id, int reset_level);
     void resetAllAlgorithms(int reset_level);

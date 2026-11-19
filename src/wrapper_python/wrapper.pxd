@@ -26,6 +26,9 @@ cdef extern from "solver.h":
         # Optimization
         void solve()
 
+        void setAlgorithmTimelimit(int id, double seconds)
+        int getAlgorithmStatus(int id)        
+
         # Problem creation
         void createProblem()
         void setProblemName(string name)

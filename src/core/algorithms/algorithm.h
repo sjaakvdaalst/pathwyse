@@ -25,6 +25,9 @@ public:
     int getStatus() {return algo_status;}
     void setStatus(int status){this->algo_status = status;}
 
+    //Time limit in seconds for the next solve. resetAlgorithm restores the value of the settings file, so call this after it.
+    void setTimelimit(float seconds) {timelimit = seconds;}    
+
     void setExecutionID(int id) {executionID = id;}
     int getExecutionID() {return executionID;}
 

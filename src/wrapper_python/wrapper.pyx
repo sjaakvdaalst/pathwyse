@@ -69,6 +69,12 @@ cdef class PWSolver:
 
     def solve(self):
         self.s.solve()
+    
+    def setAlgorithmTimelimit(self, int id, double seconds):
+        self.s.setAlgorithmTimelimit(id, seconds)
+
+    def getAlgorithmStatus(self, int id):
+        return self.s.getAlgorithmStatus(id)
 
     # --- Problem creation ---
 
